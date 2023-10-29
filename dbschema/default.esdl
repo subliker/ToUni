@@ -10,6 +10,9 @@ module default {
         }
         required created_at: datetime;
         updated_at: datetime;
+        required role: str{
+            constraint one_of ('Admin', 'User');
+        }
         multi lessons: Lesson;
     }
 

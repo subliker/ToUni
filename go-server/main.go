@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/subliker/ToUni/go-server/db"
 	"github.com/subliker/ToUni/go-server/router"
+	_ "github.com/subliker/ToUni/go-server/tests"
 )
 
 func main() {
@@ -22,4 +23,5 @@ func main() {
 	router.SetDataBase(&dataBase)
 	router.SetupRouter()
 	router.Run(os.Getenv("SERVER_PORT"))
+	// tests.Start()
 }
