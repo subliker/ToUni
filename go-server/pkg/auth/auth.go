@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -9,18 +8,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func GenerateJWT(username string) (string, error) {
+type UserClaim struct {
+	jwt.RegisteredClaims
+	Id string
+}
+
+func GenerateJWT(id string) (string, error) {
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
 	secretKey := []byte(os.Getenv("SECRET_KEY"))
-	fmt.Print(os.Getenv("SECRET_KEY"))
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(14 * 24 * time.Hour)
-	claims["authorized"] = true
-	claims["user"] = username
+	exp := jwt.NumericDate{Time: time.Now().Add(time.Hour * 24 * 14)}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaim{
+		RegisteredClaims: jwt.RegisteredClaims{ExpiresAt: &exp},
+		Id:               id,
+	})
 	tokenString, errT := token.SignedString(secretKey)
 	if errT != nil {
 		return "", errT

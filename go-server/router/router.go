@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/subliker/ToUni/go-server/db"
 	"github.com/subliker/ToUni/go-server/middleware"
-	_ "golang.org/x/crypto/bcrypt"
 )
 
 type Router struct {
@@ -47,25 +46,25 @@ func (c *Router) SetupRouter() {
 
 	c.router.Use(cors.New(config))
 
+	var Middleware middleware.Middleware
+	Middleware.SetDataBase(c.db)
+
 	// docs.SwaggerInfo.BasePath = "/api"
 	c.adminRouter = c.router.Group("/")
 
-	c.adminRouter.Use(middleware.CheckRole)
+	c.adminRouter.Use(Middleware.CheckRole)
 	c.adminRouter.GET("/api/user/:id", c.user.GetOneById)
 	c.adminRouter.GET("/api/user", c.user.GetAll)
 	c.adminRouter.POST("/api/user", c.user.Add)
 
 	c.router.POST("/api/signup", c.client.SignUp)
 	c.router.POST("/api/signin", c.client.SignIn)
-	// router.POST("/api/user", route.AddNewUser)
-	// router.DELETE("/api/user/:id", route.DeleteUserDataByID)
-	// router.PUT("/api/user/:id", route.UpdateUserDataById)
+}
 
-	// router.GET("/api/booking/:id", route.GetBookingDataById)
-	// router.GET("/api/booking", route.GetBookings)
-	// router.POST("/api/booking", route.AddNewBooking)
-	// router.DELETE("/api/booking/:id", route.DeleteBookingByID)
-	// router.PUT("/api/booking/:id", route.UpdateBookingDataById)
+func (c *Router) SetDataBase(db *db.DataBase) {
+	c.db = db
+}
 
-	// router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+func (c *Router) Run(port string) {
+	c.router.Run(":" + port)
 }

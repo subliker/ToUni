@@ -125,3 +125,21 @@ func (c *User) GetHashedPasswordByUsername(username string) (string, edgedb.UUID
 	}
 	return res.User[0].Password, res.User[0].Id, nil
 }
+
+func (c *User) GetRoleById(id string) (string, error) {
+	ctx := context.Background()
+	query := fmt.Sprintf(`
+	{
+		User (filter:{id: {eq: "%s"}}) {
+			role
+		}
+	}
+	`, id)
+	req := graphql.NewRequest(query)
+	var res QueryUserResponse
+	err := c.client.Run(ctx, req, &res)
+	if err != nil {
+		return "", err
+	}
+	return res.User[0].Role, nil
+}
